@@ -276,19 +276,3 @@ module.exports = {
     asyncErrorBoundary(updateReservation),
   ],
 };
-
-module.exports = {
-  list: [dateHasReservations, asyncErrorBoundary(list)],
-  create: [
-    hasProperties(...VALID_PROPERTIES),
-    hasOnlyValidProperties(...VALID_PROPERTIES),
-    dateIsValid,
-    timeIsValid,
-    peopleIsNumber,
-    notTuesday,
-    notInPast,
-    duringOperatingHours,
-    asyncErrorBoundary(create),
-  ],
-  read: [asyncErrorBoundary(reservationExists), asyncErrorBoundary(read)],
-};
