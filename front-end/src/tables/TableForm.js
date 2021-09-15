@@ -69,9 +69,10 @@ export default function TableForm() {
     <>
       <ErrorAlert error={reservationsError} />
       <form onSubmit={handleSubmit}>
-        <div>
+        <div className="form-group">
           <label htmlFor="table_name">Table Name</label>
           <input
+            className="form-control"
             type="text"
             name="table_name"
             id="table_name"
@@ -80,10 +81,11 @@ export default function TableForm() {
             value={form.table_name}
           />
         </div>
-        <div>
+        <div className="form-group">
           <label htmlFor="capacity">Table Capacity</label>
           <input
-            type="text"
+            className="form-control"
+            type="number"
             name="capacity"
             id="capacity"
             onChange={handleChange}
@@ -91,8 +93,14 @@ export default function TableForm() {
             value={form.capacity}
           />
         </div>
-        <button type="submit">Submit</button>
-        <button type="button" onClick={() => history.goBack()}>
+        <button className="btn btn-dark" type="submit">
+          Submit
+        </button>
+        <button
+          className="btn btn-dark mx-3"
+          type="button"
+          onClick={() => history.goBack()}
+        >
           Cancel
         </button>
       </form>

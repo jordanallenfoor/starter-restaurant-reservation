@@ -52,13 +52,14 @@ export default function Search() {
   return (
     <>
       <div className="headingBar d-md-flex my-3 p-2">
-                <h1>Search by Phone Number</h1>
-            </div>
+        <h1>Search by Phone Number</h1>
+      </div>
       <ErrorAlert error={searchError} />
       <form onSubmit={handleSubmit}>
-        <div>
+        <div className="form-group">
           <label htmlFor="mobile_number">Mobile Number</label>
           <input
+            className="form-control"
             type="text"
             name="mobile_number"
             id="mobile_number"
@@ -68,8 +69,8 @@ export default function Search() {
             value={form.mobile_number}
           />
         </div>
-        <button type="submit">Find</button>
-        <button type="button" onClick={() => history.goBack()}>
+        <button className="btn btn-dark mb-3" type="submit">Find</button>
+        <button className="btn btn-dark mx-3 mb-3" type="button" onClick={() => history.goBack()}>
           Cancel
         </button>
       </form>

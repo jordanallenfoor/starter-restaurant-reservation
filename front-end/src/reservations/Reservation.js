@@ -11,7 +11,6 @@ export default function Reservation({
   people,
   status,
 }) {
-  const location = useLocation();
   const [cancelError, setCancelError] = useState([]);
   const location = useLocation();
   const history = useHistory();
@@ -56,24 +55,27 @@ export default function Reservation({
         </p>
         <p data-reservation-id-status={reservation_id}>Status: {status}</p>
         {location.pathname.includes("seat") && status === "booked" ? (
-          <Link to={`/reservations/${reservation_id}/seat`}>
-            <button className="btn btn-dark" type="button">Seat</button>
-          </Link>
+          <>
+            <Link to={`/reservations/${reservation_id}/seat`}>
+              <button className="btn btn-dark mr-3" type="button">
+                Seat
+              </button>
+            </Link>
+            <Link to={`/reservations/${reservation_id}/edit`}>
+              <button className="btn btn-dark mr-3" type="button">
+                Edit
+              </button>
+            </Link>
+            <button
+              className="btn btn-dark"
+              type="button"
+              onClick={cancelHandler}
+              data-reservation-id-cancel={reservation_id}
+            >
+              Cancel
+            </button>
+          </>
         ) : null}
-        {status === "booked" ? (
-          <Link to={`/reservations/${reservation_id}/edit`}>
-            <button className="btn btn-dark mx-2"type="button">Edit</button>
-          </Link>
-        ) : null}
-
-        <button
-        className="btn btn-dark"
-          type="button"
-          onClick={cancelHandler}
-          data-reservation-id-cancel={reservation_id}
-        >
-          Cancel
-        </button>
       </div>
     </div>
   );
