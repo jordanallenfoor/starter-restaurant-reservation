@@ -150,6 +150,12 @@ async function finish(req, res) {
     status: "Free",
   };
   const updatedTable = await service.finish(updatedTableData);
+  // set reservation status to "finished" using reservation id
+  const updatedReservation = {
+    status: "finished",
+    reservation_id: table.reservation_id,
+  };
+  await reservationService.update(updatedReservation);
   res.json({ data: updatedTable });
 }
 
