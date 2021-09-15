@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { finishTable } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
