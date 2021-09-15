@@ -57,9 +57,5 @@ async function create(req, res) {
 
 module.exports = {
   list: [dateHasReservations, asyncErrorBoundary(list)],
-  create: [
-    hasOnlyValidProperties,
-    hasRequiredProperties,
-    asyncErrorBoundary(create),
-  ],
+  create: [hasOnlyValidProperties, hasProperties, asyncErrorBoundary(create)],
 };
