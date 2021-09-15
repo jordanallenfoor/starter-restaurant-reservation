@@ -272,9 +272,15 @@ describe("US-06 - Reservation status", () => {
 
       const reservationsResponse = await request(app)
         .get(
-          `/reservations?date=${asDateString(reservationOne.reservation_date)}`
+          //`/reservations?date=${asDateString(reservationOne.reservation_date)}`
+          `/reservations?date=${reservationOne.reservation_date}`
         )
         .set("Accept", "application/json");
+
+      console.log(
+        reservationOne.reservation_date,
+        asDateString(reservationOne.reservation_date)
+      );
 
       expect(reservationsResponse.body.error).toBeUndefined();
 
@@ -288,7 +294,8 @@ describe("US-06 - Reservation status", () => {
 });
 
 function asDateString(date) {
-  return `${date.getFullYear().toString(10)}-${(date.getMonth() + 1)
+  const newDate = new Date(date);
+  return `${newDate.getFullYear().toString(10)}-${(newDate.getMonth() + 1)
     .toString(10)
-    .padStart(2, "0")}-${date.getDate().toString(10).padStart(2, "0")}`;
+    .padStart(2, "0")}-${newDate.getDate().toString(10).padStart(2, "0")}`;
 }

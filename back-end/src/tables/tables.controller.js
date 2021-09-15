@@ -54,9 +54,14 @@ async function tableExists(req, res, next) {
 async function reservationExists(req, res, next) {
   const { reservation_id } = req.body.data;
   const data = await reservationService.read(reservation_id);
-  if (data) {
+  if (data && data.status !== "seated") {
     res.locals.reservation = data;
     return next();
+  } else if (data && data.status === "seated") {
+    return next({
+      status: 400,
+      message: `reservation_id: ${reservation_id} is already seated.`,
+    });
   } else {
     return next({
       status: 404,
@@ -119,7 +124,7 @@ async function create(req, res) {
 // seat a reservation at a table
 async function seat(req, res) {
   const { table } = res.locals;
-  const { reservation_id } = req.body.data;
+  const { reservation_id } = req.locals.reservation;
   const { table_id } = req.params;
   const updatedTableData = {
     ...table,
@@ -128,6 +133,12 @@ async function seat(req, res) {
     status: "Occupied",
   };
   const updatedTable = await service.seat(updatedTableData);
+  // set reservation status to "seated" using reservation id
+  const updatedReservation = {
+    status: "seated",
+    reservation_id: reservation_id,
+  };
+  await reservationService.update(updatedReservation);
   res.json({ data: updatedTable });
 }
 
