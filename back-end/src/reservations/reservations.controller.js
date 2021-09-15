@@ -53,7 +53,7 @@ function timeIsValid(req, res, next) {
 function peopleIsNumber(req, res, next) {
   const { people } = req.body.data;
   const peopleToNum = parseInt(people);
-  const partySize = Number.isInteger(peopleToNum);
+  const partySize = Number.isInteger(peopleInt);
   if (partySize) {
     return next();
   } else {
@@ -67,7 +67,10 @@ function peopleIsNumber(req, res, next) {
 // validation middleware: checks that the reservation_date & reservation_time are not in the past
 function notInPast(req, res, next) {
   const { reservation_date, reservation_time } = req.body.data;
-  const reservation = new Date(`${reservation_date} PDT`).setHours(reservation_time.substring(0, 2), reservation_time.substring(3));
+  const reservation = new Date(`${reservation_date} PDT`).setHours(
+    reservation_time.substring(0, 2),
+    reservation_time.substring(3)
+  );
   const now = Date.now();
   if (reservation > now) {
     return next();
