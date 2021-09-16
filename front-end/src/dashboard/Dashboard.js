@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { listReservations, listTables } from "../utils/api";
+import React from "react";
 import ErrorAlert from "../layout/ErrorAlert";
-import Reservations from "../reservations/Reservations";
-import Tables from "../tables/Tables";
-import { previous, next, today } from "../utils/date-time";
-import { Link } from "react-router-dom";
-import useQuery from "../utils/useQuery";
+import { useHistory } from "react-router-dom";
+import { previous, today, next } from "../utils/date-time";
+import ReservationRow from "./ReservationRow";
+import TableRow from "./TableRow";
 
 /**
  * Defines the dashboard page.
@@ -13,101 +11,107 @@ import useQuery from "../utils/useQuery";
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
-function Dashboard({ date }) {
-  // if there's a date query in the URL, use that instead of the default of "today"
-  const dateQuery = useQuery().get("date");
-  if (dateQuery) {
-    date = dateQuery;
-  }
 
-  const [reservations, setReservations] = useState([]);
-  const [tables, setTables] = useState([]);
-  const [dashboardError, setDashboardError] = useState([]);
+function Dashboard({
+  date,
+  reservations,
+  reservationsError,
+  tables,
+  tablesError,
+  loadDashboard,
+}) {
+  const history = useHistory();
 
-  // formats the date variable to be human readable
-  const dateObj = new Date(`${date} PDT`);
-  const dateString = dateObj.toDateString();
-
-  // load the reservations by date
-  useEffect(() => {
-    const abortController = new AbortController();
-    async function loadDashboard() {
-      try {
-        setDashboardError([]);
-        const reservationDate = await listReservations(
-          { date },
-          abortController.signal
-        );
-        setReservations(reservationDate);
-      } catch (error) {
-        setReservations([]);
-        setDashboardError(error.message);
-      }
-    }
-    loadDashboard();
-    return () => abortController.abort();
-  }, [date]);
-
-  // load all tables
-  useEffect(() => {
-    const abortController = new AbortController();
-
-    async function loadTables() {
-      try {
-        setDashboardError([]);
-        const tableList = await listTables(abortController.signal);
-        setTables(tableList);
-      } catch (error) {
-        setTables([]);
-        setDashboardError([error.message]);
-      }
-    }
-    loadTables();
-    return () => abortController.abort();
-  }, []);
+  const reservationsJSX = () => {
+    return reservations.map((reservation) => (
+      <ReservationRow
+        key={reservation.reservation_id}
+        reservation={reservation}
+        loadDashboard={loadDashboard}
+      />
+    ));
+  };
+  const tablesJSX = () => {
+    return tables.map((table) => (
+      <TableRow
+        key={table.table_id}
+        loadDashboard={loadDashboard}
+        table={table}
+      />
+    ));
+  };
+  //change the date to US friendly
+  const formatDate = (date) => {
+    let splitDate = date.split("-");
+    console.log(splitDate);
+    return `${splitDate[1]}/${splitDate[2]}/${splitDate[0]}`;
+  };
 
   return (
     <main>
-      <div className="headingBar d-md-flex my-3 p-2">
-        <h1>Dashboard</h1>
-      </div>
-      <ErrorAlert error={dashboardError} />
-      <div className="d-flex justify-content-center my-3">
-        <h4 className="mb-0">Reservations for {dateString}</h4>
-      </div>
-      <div className="d-flex justify-content-center mt-3">
-        <Link to={`/dashboard?date=${previous(date)}`}>
-          <button className="btn btn-dark" type="button">
-            <span className="oi oi-arrow-thick-left" />
-            &nbsp;Previous Day
-          </button>
-        </Link>
-        <Link to={`/dashboard?date=${today()}`}>
-          <button className="btn btn-dark mx-3" type="button">
-            Today
-          </button>
-        </Link>
-        <Link to={`/dashboard?date=${next(date)}`}>
-          <button className="btn btn-dark" type="button">
-            Next Day&nbsp;
-            <span className="oi oi-arrow-thick-right" />
-          </button>
-        </Link>
+      <h1>Dashboard</h1>
+      <div className="btn-group m-1" role="group">
+        <button
+          type="button"
+          className="btn btn-outline-primary btn-sm"
+          onClick={() => history.push(`/dashboard?date=${previous(date)}`)}
+        >
+          Prev.
+        </button>
+        <button
+          type="button"
+          className="btn btn-outline-primary btn-sm"
+          onClick={() => history.push(`/dashboard?date=${today()}`)}
+        >
+          Today
+        </button>
+        <button
+          type="button"
+          className="btn btn-outline-primary btn-sm"
+          onClick={() => history.push(`/dashboard?date=${next(date)}`)}
+        >
+          Next
+        </button>
       </div>
       <div className="d-md-flex mb-3">
-        <div className="mb-3 mx-3">
-          <div className="headingBar my-3 p-2">
-            <h2>Reservations</h2>
-          </div>
-          <Reservations reservations={reservations} />
-        </div>
-        <div className="mb-3 mx-3">
-          <div className="headingBar my-3 p-2">
-            <h2>Tables</h2>
-          </div>
-          <Tables tables={tables} />
-        </div>
+        <h4 className="mb-0">Reservations for {formatDate(date)}</h4>
       </div>
+      <ErrorAlert error={reservationsError} />
+      <table className="table table-hover ">
+        <thead className="shadow-sm">
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Mobile Number</th>
+            <th scope="col">Time</th>
+            <th scope="col">People</th>
+            <th scope="col">Status</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Cancel</th>
+            <th scope="col">Seat</th>
+          </tr>
+        </thead>
+        <tbody>{reservationsJSX()}</tbody>
+      </table>
+
+      <div className="d-md-flex mb-3">
+        <h4 className="mb-0">Tables</h4>
+      </div>
+      <ErrorAlert error={tablesError} />
+
+      <table className="table">
+        <thead className="shadow-sm">
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Table Name</th>
+            <th scope="col">Capacity</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+
+        <tbody>{tablesJSX()}</tbody>
+      </table>
     </main>
   );
 }

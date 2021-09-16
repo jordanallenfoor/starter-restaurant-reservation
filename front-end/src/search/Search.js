@@ -1,84 +1,105 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import ReservationList from "../dashboard/ReservationRow";
 import ErrorAlert from "../layout/ErrorAlert";
-import Reservations from "../reservations/Reservations";
-import { readByPhone } from "../utils/api";
+import { listReservations } from "../utils/api";
 
-// defines the Search page
-export default function Search() {
-  const initialFormState = {
-    mobile_number: "",
-  };
+function Search() {
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [reservations, setReservations] = useState([]);
+  const [error, setError] = useState(null);
 
-  const [form, setForm] = useState({ ...initialFormState });
-  const [searchResults, setSearchResults] = useState([]);
-  const [searchError, setSearchError] = useState([]);
+  // const formatPhoneNumber = (number) => {
+  //   let phoneNumber = number.replace(/[^\d]/g, "");
+  //   return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(
+  //     3,
+  //     6
+  //   )}-${phoneNumber.slice(6, 10)}`;
+  // };
 
-  const history = useHistory();
+  function handleChange({ target }) {
+    setMobileNumber(target.value);
+  }
 
-  const handleChange = ({ target }) => {
-    // set the form state
-    setForm({
-      ...form,
-      [target.name]: target.value,
-    });
-  };
+  // const validateNumber = (number) => {
+  //   var re = /^\d{3}-\d{3}-\d{4}/g;
 
-  const handleSubmit = (event) => {
+  //   return re.test(number);
+  // };
+
+  function handleSubmit(event) {
     event.preventDefault();
     const abortController = new AbortController();
-    // GET request - by mobile_number
-    async function findByPhone() {
-      try {
-        const response = await readByPhone(
-          form.mobile_number,
-          abortController.signal
-        );
-        if (response.length === 0) {
-          setSearchResults(["No reservations Found"]);
-        } else {
-          setSearchResults(response);
-        }
-      } catch (error) {
-        setSearchError([...searchError, error.message]);
-      }
+    setError(null);
+    if (mobileNumber) {
+      listReservations({ mobile_number: mobileNumber }, abortController.signal)
+        .then(setReservations)
+        .catch(setError);
     }
-    // do not send GET request if there is a pending error message
-    if (searchError.length === 0) {
-      findByPhone();
-    }
+
+    return () => abortController.abort();
+  }
+
+  const searchResultsJSX = () => {
+    return reservations.length > 0 ? (
+      reservations.map((reservation) => (
+        <ReservationList
+          key={reservation.reservation_id}
+          reservation={reservation}
+        />
+      ))
+    ) : (
+      <p>No reservations found</p>
+    );
   };
 
   return (
-    <>
-      <div className="headingBar d-md-flex my-3 p-2">
-        <h1>Search by Phone Number</h1>
-      </div>
-      <ErrorAlert error={searchError} />
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="mobile_number">Mobile Number</label>
-          <input
-            className="form-control"
-            type="text"
-            name="mobile_number"
-            id="mobile_number"
-            placeholder="Enter a customer's phone number"
-            onChange={handleChange}
-            required="required"
-            value={form.mobile_number}
-          />
-        </div>
-        <button className="btn btn-dark mb-3" type="submit">Find</button>
-        <button className="btn btn-dark mx-3 mb-3" type="button" onClick={() => history.goBack()}>
-          Cancel
+    <div>
+      <form className="m-1 form-inline">
+        <ErrorAlert error={error} />
+
+        <label htmlFor="mobile_number">
+          Enter customer's phone number:&nbsp;
+        </label>
+        <input
+          name="mobile_number"
+          id="mobile_number"
+          type="tel"
+          onChange={handleChange}
+          value={mobileNumber}
+          placeholder="(000)-000-0000"
+          className="form-control mr-sm-2 "
+          required
+        />
+
+        <button
+          className="btn btn-outline-primary my-2 my-sm-0"
+          type="submit"
+          onClick={handleSubmit}
+        >
+          Find
         </button>
       </form>
-      {searchResults[0] === "No reservations Found" ? (
-        <h4>{searchResults[0]}</h4>
-      ) : (
-        <Reservations reservations={searchResults} />
-      )}
-    </>
+
+      <table className="table">
+        <thead className="shadow-sm">
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Mobile Number</th>
+            <th scope="col">Time</th>
+            <th scope="col">People</th>
+            <th scope="col">Status</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Cancel</th>
+            <th scope="col">Seat</th>
+          </tr>
+        </thead>
+
+        <tbody>{searchResultsJSX()}</tbody>
+      </table>
+    </div>
   );
 }
+
+export default Search;
