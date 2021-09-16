@@ -55,7 +55,6 @@ async function reservationExists(req, res, next) {
   const data = await reservationService.read(reservation_id);
   if (data && data.status !== "seated") {
     res.locals.reservation = data;
-    console.log(res.locals.reservation);
     return next();
   } else if (data && data.status === "seated") {
     return next({
