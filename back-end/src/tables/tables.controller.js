@@ -116,8 +116,12 @@ async function list(req, res) {
 
 // create a new table
 async function create(req, res) {
-  const table = await service.create(req.body.data);
-  res.status(201).json({ data: table });
+  if (typeof req.body.data.capacity !== "number") {
+    res.status(400).json({ error: ["capacity"] });
+  } else {
+    const table = await service.create(req.body.data);
+    res.status(201).json({ data: table });
+  }
 }
 
 // seat a reservation at a table

@@ -200,9 +200,15 @@ function statusIsNotFinished(req, res, next) {
 }
 
 // list reservations by date
-function list(req, res) {
-  const { data } = res.locals;
-  res.json({ data: data });
+async function list(req, res) {
+  const date = req.query.date;
+  const mobile_number = req.query.mobile_number;
+
+  const reservations = await service.list(date, mobile_number);
+  const response = reservations.filter(
+    (reservation) => reservation.status !== "finished"
+  );
+  res.json({ data: response });
 }
 
 // creates a reservation
