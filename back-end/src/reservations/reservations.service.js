@@ -33,6 +33,7 @@ function list() {
 }
 
 function listByDate(reservation_date) {
+  reservation_date = new Date(reservation_date).toJSON().substring(0, 10);
   return knex("reservations")
     .select("*")
     .where({ reservation_date })

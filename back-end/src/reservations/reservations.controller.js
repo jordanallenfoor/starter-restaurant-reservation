@@ -178,7 +178,9 @@ function noReservationsOnTuesdays(req, res, next) {
 function noReservationsInPast(req, res, next) {
   const { reservation_date, reservation_time } = req.body.data;
   const presentDate = Date.now();
-  const newReservationDate = new Date(`${reservation_date} ${reservation_time}`).valueOf();
+  const newReservationDate = new Date(
+    `${reservation_date} ${reservation_time}`
+  ).valueOf();
   if (newReservationDate > presentDate) {
     return next();
   }
