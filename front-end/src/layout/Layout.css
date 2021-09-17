@@ -1,4 +1,35 @@
+.main {
+  background-color: rgb(212, 211, 211);
+  height: 100%;
+  min-height: 100vh;
+}
+
+.list-background {
+  background-color: rgb(179, 178, 178);
+}
+
+.card-background {
+  background-color: rgb(233, 233, 233);
+}
+
 .side-bar {
-  background-color: #393a44;
+  background-color: black;
   min-width: 200px;
+}
+
+.boldtext {
+  font-weight: bolder;
+}
+
+@media (min-width: 768px) {
+  .main {
+    height: 100%;
+    min-height: 100vh;
+  }
+
+  .side-bar {
+    background-color: black;
+    min-width: 200px;
+    min-height: 100%;
+  }
 }
