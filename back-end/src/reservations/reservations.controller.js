@@ -11,7 +11,7 @@ async function list(req, res) {
   // console.log("reservations controller list");
 
   const reservations = await service.list(date, mobile_number);
-  console.log("list",reservations, date, mobile_number);
+  console.log("list", reservations, date, mobile_number);
   const response = reservations.filter(
     (reservation) => reservation.status !== "finished"
   );
@@ -20,11 +20,9 @@ async function list(req, res) {
 }
 
 async function create(req, res) {
-  req.body.data.status = "booked";
-
   const response = await service.create(req.body.data);
   // console.log("create", response);
-  res.status(201).json({ data: response[0] });
+  res.status(201).json({ data: response });
 }
 
 function validateBody(req, res, next) {
